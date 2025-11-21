@@ -1,13 +1,16 @@
 'use client';
 
-import { signIn } from "next-auth/react";
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
 
-export default function SignIn() {
+export default function SignUp() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -15,9 +18,39 @@ export default function SignIn() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Error al crear la cuenta");
+        return;
+      }
+
       const result = await signIn("credentials", {
         email,
         password,
@@ -25,13 +58,13 @@ export default function SignIn() {
       });
 
       if (result?.error) {
-        setError("Credenciales inválidas");
+        setError("Error al iniciar sesión");
       } else {
         router.push("/");
         router.refresh();
       }
     } catch (error) {
-      setError("Error al iniciar sesión");
+      setError("Error al crear la cuenta");
     } finally {
       setIsLoading(false);
     }
@@ -65,10 +98,21 @@ export default function SignIn() {
 
         <div className="rounded-3xl border-2 border-purple-500/30 bg-gradient-to-br from-gray-900/80 to-purple-950/40 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(168,85,247,0.2)]">
           <h2 className="mb-6 text-2xl font-black text-white text-center">
-            Iniciar Sesión
+            Crear Cuenta
           </h2>
           
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <input
+                type="text"
+                placeholder="Nombre"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full rounded-xl border-2 border-purple-500/30 bg-gray-900/60 px-4 py-3 text-white placeholder:text-gray-500 focus:border-purple-400 focus:outline-none transition-colors"
+              />
+            </div>
+
             <div>
               <input
                 type="email"
@@ -91,6 +135,17 @@ export default function SignIn() {
               />
             </div>
 
+            <div>
+              <input
+                type="password"
+                placeholder="Confirmar Contraseña"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="w-full rounded-xl border-2 border-purple-500/30 bg-gray-900/60 px-4 py-3 text-white placeholder:text-gray-500 focus:border-purple-400 focus:outline-none transition-colors"
+              />
+            </div>
+
             {error && (
               <div className="rounded-lg bg-red-500/20 border border-red-500/50 px-4 py-2 text-sm text-red-300">
                 {error}
@@ -102,9 +157,19 @@ export default function SignIn() {
               disabled={isLoading}
               className="w-full rounded-xl border-2 border-purple-500/50 bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4 font-bold uppercase tracking-wider text-white shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(168,85,247,0.6)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {isLoading ? "Cargando..." : "Iniciar Sesión"}
+              {isLoading ? "Creando cuenta..." : "Registrarse"}
             </button>
           </form>
+
+          <div className="mt-6 text-center text-sm text-gray-400">
+            ¿Ya tienes cuenta?{" "}
+            <Link 
+              href="/auth/signin" 
+              className="font-bold text-purple-400 hover:text-purple-300 transition-colors"
+            >
+              Inicia sesión
+            </Link>
+          </div>
         </div>
       </div>
     </div>

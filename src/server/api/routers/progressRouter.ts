@@ -4,7 +4,7 @@ import { TRPCError } from '@trpc/server';
 
 export const progressRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx }) => {
-    const progress = await ctx.db.progress.findUnique({
+    let progress = await ctx.db.progress.findUnique({
       where: { userId: ctx.session.user.id },
       include: {
         days: {
@@ -17,15 +17,30 @@ export const progressRouter = createTRPCRouter({
     });
 
     if (!progress) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Progress not found',
+      const startDate = new Date();
+      const targetDate = new Date('2025-01-15');
+      const totalProblems = 336;
+
+      progress = await ctx.db.progress.create({
+        data: {
+          userId: ctx.session.user.id,
+          startDate,
+          targetDate,
+          totalProblems,
+        },
+        include: {
+          days: {
+            include: {
+              problems: true,
+            },
+            orderBy: { date: 'desc' },
+          },
+        },
       });
     }
 
     return progress;
   }),
-
   create: protectedProcedure
     .input(
       z.object({
@@ -285,7 +300,7 @@ function getThemeForDate(date: Date): string {
     'DP (2D)',
   ];
 
-  const start = new Date('2024-11-20');
+  const start = new Date();
   const diffDays = Math.floor((date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   return THEMES[diffDays % 14];
 }
