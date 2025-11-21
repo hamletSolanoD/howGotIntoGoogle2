@@ -1,0 +1,48 @@
+{
+  "user": "hamletsolanod@gmail.com",
+  "startDate": "2025-11-20",
+  "targetDate": "2025-01-15",
+  "totalProblems": 300,
+  "currentTotal": 23,
+  "streak": 0,
+  "lastCompletedDate": "2024-11-20",
+  "days": {
+    "2024-11-20": {
+      "date": "2024-11-20",
+      "theme": "Arrays, Two Pointers, Sliding Window",
+      "problems": [
+        {
+          "id": 1,
+          "completed": true,
+          "link": "https://leetcode.com/problems/two-sum/",
+          "completedAt": "2024-11-20T10:30:00Z"
+        },
+        {
+          "id": 2,
+          "completed": true,
+          "link": "https://leetcode.com/problems/container-with-most-water/",
+          "completedAt": "2024-11-20T11:45:00Z"
+        },
+        {
+          "id": 3,
+          "completed": true,
+          "completedAt": "2024-11-20T13:20:00Z"
+        },
+        {
+          "id": 4,
+          "completed": true,
+          "completedAt": "2024-11-20T15:10:00Z"
+        },
+        {
+          "id": 5,
+          "completed": false
+        },
+        {
+          "id": 6,
+          "completed": false
+        }
+      ],
+      "notes": "Día 1 - Buen inicio, necesito repasar sliding window"
+    }
+  }
+}
